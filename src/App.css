@@ -1,0 +1,60 @@
+.App {
+  min-height: 100vh;
+  max-height: 100vh;
+  display: flex;
+}
+
+.left-pane {
+  background-color: grey;
+  width: 25%;
+  min-width: 25%;
+  max-height: 100vh;
+}
+
+.add-artist {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 100px;
+}
+
+.view-artists {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 10px;
+  overflow-y: scroll;
+  height: calc(100vh - 100px);
+  margin-top: 0;
+}
+
+.artist-list-item {
+  font-size: large;
+}
+
+.artist-list-item:hover {
+  color: red;
+  cursor: pointer;
+}
+
+.right-pane {
+  text-align: center;
+  justify-content: center;
+  flex-direction: column;
+  display: flex;
+  width: 75%;
+  min-width: 75%;
+}
+
+.artist-list {
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+}
+
+ul {
+  list-style: none;
+  padding-left: 0;
+}

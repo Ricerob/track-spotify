@@ -1,11 +1,36 @@
 import { useState, useEffect } from 'react';
 import './App.css';
+import checkIfValid from './api/checkIfValid';
 
 function App() {
   const [hasArtists, setHasArtists] = useState(false);
   const [artists, setArtists] = useState([]);
+  const [accessToken, setAccessToken] = useState('');
+  const [artistsData, setArtistsData] = useState([])
+
+  const secret = process.env.REACT_APP_SECRET
+  const client_id = process.env.REACT_APP_CLIENT_ID
+  const credentials = btoa(`${client_id}:${secret}`);
+
+  require('dotenv').config();
 
   useEffect(() => {
+    async function fetchToken() {
+      await fetch('https://accounts.spotify.com/api/token', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Basic ${credentials}`,
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body:'grant_type=client_credentials'
+    })
+        .then(response => response.json())
+        .then(data => {
+            setAccessToken(data.access_token)
+        });
+    }
+    fetchToken()
+
     const storedArtists = localStorage.getItem('artists');
     if (storedArtists) {
       setArtists(JSON.parse(storedArtists));
@@ -14,14 +39,9 @@ function App() {
     else {
       setHasArtists(false);
     }
-    console.log(artists)
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem('artists', JSON.stringify(artists));
-  }, [artists]);
-
-  function handleClick() {
+  async function handleClick() {
     const input = document.getElementById('artist-input').value;
     if(artists.includes(input)) {
       alert(input + ' already added.')
@@ -30,13 +50,25 @@ function App() {
       alert('Error in input')
     }
     else {
-     setArtists([...artists, input.trim()])
+      const valid = await checkIfValid(input, accessToken);
+      if(!valid) {
+        alert(input + ' is not a valid artist ID.')
+      }
+      else {
+        setArtists([...artists, input.trim()])
+        localStorage.setItem('artists', JSON.stringify([...artists, input.trim()]))
+      }
     }
   }
 
+  function collectArtistData(artist_data) {
+
+  }
+
   function removeArtist(index) {
-    const updatedArtists = artists.filter((artist, i) => i !== index);
+    const updatedArtists = artists.filter((i) => i !== index);
     setArtists(updatedArtists);
+    localStorage.setItem('artists', updatedArtists)
   }
 
   return (
@@ -53,7 +85,7 @@ function App() {
           <ul>
             {artists.map((artist, index) => {
               return(
-                <li className='artist-list-item' onClick={() => removeArtist(index)}>{artist}</li>)
+                <li className='artist-list-item' onClick={() => removeArtist(artist)}>{artist}</li>)
             })}
           </ul>
         </div>
@@ -64,7 +96,7 @@ function App() {
         {!hasArtists && <h2>Add an artist to get started!</h2>}
         {/* Scrollable Pane */}
         <div className='artist-list'>
-
+            
         </div>
       </div>
     </div>

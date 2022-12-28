@@ -1,19 +1,33 @@
-// DO NOT PUSH UNTIL USING NODE ENV
 
-// Call https://api.spotify.com/v1/artists/test1, if 400 return false
+// Call for search
 export default async function checkIfValid(id, access_token) {
+    id = id.replace(" ", "%20");
+    var artistId = ''
+    var name = ''
+    console.log(`Searching for ${id}`)
+    const url = `https://api.spotify.com/v1/search?q=${id}&type=artist&limit=2`
 
-    const response = await fetch(`https://api.spotify.com/v1/artists/${id}`, {
+    await fetch(url, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${access_token}`
-        }
-    });
-    const data = await response.json();
-
-    if(data.error) {
-        return false
-    }
-    return data
+            'Authorization': `Bearer ${access_token}`,
+            'Accept': 'application/json'
+        },
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data)
+            if (data.error || data.artists.items.length === 0) {
+                console.log(`Error in grabbing data`)
+                return false
+            }
+            else {
+                name = data.artists.items[0].name;
+                artistId = data.artists.items[0].id;
+                console.log(`Successful ID grab, ${artistId} for ${id}`)
+                artistId = artistId
+            }
+        })
+    return {"artistId": artistId, "name": name}
 };

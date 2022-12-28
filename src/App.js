@@ -2,23 +2,25 @@ import { useState, useEffect } from 'react';
 import './App.css';
 import checkIfValid from './api/checkIfValid';
 import grabTracks from './api/grabTracks';
+import grabName from './api/grabName';
 import TrackPanel from './trackPanel';
 require('dotenv').config();
 
 function App() {
   const [hasArtists, setHasArtists] = useState(false);
   const [artists, setArtists] = useState([]);
-  const [artistsNames, setArtistsNames] = useState([])
   const [accessToken, setAccessToken] = useState('');
   const [tracks, setTracks] = useState([])
+  const [sortedTracks, setSortedTracks] = useState([])
+  const [artistsMapping, setArtistsMapping] = useState([]);
   require('dotenv').config();
 
   useEffect(() => {
 
     async function fetchToken() {
-      const credentials = btoa(`${process.env.REACT_APP_SECRET}:${process.env.REACT_APP_CLIENT_ID}`);
+      const credentials = btoa(`${process.env.REACT_APP_CLIENT_ID}:${process.env.REACT_APP_SECRET}`);
 
-      await fetch('https://accounts.spotify.com/api/token', {
+      const res = await fetch('https://accounts.spotify.com/api/token', {
         method: 'POST',
         headers: {
           'Authorization': `Basic ${credentials}`,
@@ -29,24 +31,45 @@ function App() {
         .then(response => response.json())
         .then(data => {
           setAccessToken(data.access_token)
+
+          var storedArtists = localStorage.getItem('artists');
+          if (storedArtists) {
+            if (storedArtists[0] !== "[") {
+              storedArtists = `["${storedArtists}"]`
+            }
+            setArtists(JSON.parse(storedArtists));
+            setHasArtists(true);
+
+            JSON.parse(storedArtists).forEach(async (artist) => {
+              const ret = await grabName(artist, data.access_token);
+              if (!ret) {
+                alert(artist + ' returned no naming results.')
+              }
+              else {
+                console.log('returned from checkIfValid with ID' + ret)
+                const newMap = { "artistId": artist, "name": ret }
+                var added = [...artistsMapping]
+                added = added.concat(newMap);
+                console.log(added)
+                setArtistsMapping(added)
+              }
+            })
+          }
+          else {
+            setHasArtists(false);
+          }
         });
     }
     fetchToken()
 
-    const storedArtists = localStorage.getItem('artists');
-    const storedArtistsNames = localStorage.getItem('artistsNames');
-    if(storedArtists){
-      setArtists(JSON.parse(storedArtists));
-      setArtistsNames(JSON.parse(storedArtistsNames));
-      setHasArtists(true);
-    }
-    else {
-      setHasArtists(false);
-    }
-
   }, []);
 
   async function handleClick() {
+    if (!accessToken) {
+      console.log("No access token - cannot populate tracks")
+      return false
+    }
+
     const input = document.getElementById('artist-input').value;
     if (artists.includes(input)) {
       alert(input + ' already added.')
@@ -55,22 +78,22 @@ function App() {
       alert('Error in input')
     }
     else {
-      const valid = await checkIfValid(input, accessToken);
-      if (!valid) {
-        alert(input + ' is not a valid artist ID.')
+      const ret = await checkIfValid(input, accessToken)
+      if (!ret) {
+        alert(input + ' returned no search results.')
       }
       else {
-        setArtists([...artists, input.trim()])
-        setArtistsNames([...artistsNames, valid.name])
-        if(!hasArtists) setHasArtists(true);
-        localStorage.setItem('artists', JSON.stringify([...artists, input.trim()]))
-        localStorage.setItem('artistsNames', JSON.stringify([...artistsNames, valid.name]))
-        //await populateTracks(input.trim())
+        console.log('returned from checkIfValid with ID' + ret.artistId)
+        setArtists([...artists, ret.artistId])
+        setArtistsMapping([...artistsMapping, ret])
+        console.log(artistsMapping)
+        if (!hasArtists) setHasArtists(true);
+        localStorage.setItem('artists', JSON.stringify([...artists, ret.artistId]))
       }
     }
   }
 
-  function parseArtists(artists_list){
+  function parseArtists(artists_list) {
     var artistsArray = []
     artists_list.forEach(artist => {
       artistsArray.push(artist.name)
@@ -80,12 +103,18 @@ function App() {
 
   // Grabs a single artist's tracks, sets 
   async function populateTracks(artist_id) {
+    if (!accessToken) {
+      console.log("No access token - cannot populate tracks")
+      return false
+    }
+    console.log(`Populating tracks for ${artist_id} in populateTracks`)
     const tracksRet = await grabTracks(artist_id, accessToken)
     if (!tracksRet) {
       console.log('error in grabbing tracks')
     }
     else {
-      tracksRet.forEach(track => {
+      let soonTracks = []
+      tracksRet.forEach((track, i) => {
         var trackInfo = {
           'artists': parseArtists(track.artists),
           'track_name': track.name,
@@ -93,33 +122,43 @@ function App() {
           'link': track.external_urls.spotify,
           'date_released': track.release_date
         }
-        setTracks(prevTracks => [...prevTracks, trackInfo])
+        soonTracks.push(trackInfo)
       });
+      return soonTracks
     }
   }
 
-  function renderTracks() {
-    if(tracks) setTracks([])
-    artists.forEach(async artist => {
-      await populateTracks(artist)
-    })
+  async function populateArtistsTracks() {
+    setTracks([])
+    let artistTracks = []
 
-    const sortedTrackList = () => {
-      return tracks.sort((a, b) => {
-        return new Date(b.date_released) - new Date(a.date_released)
-      })
+    for (let i = 0; i < artists.length; i++) {
+      let ret = await populateTracks(artists[i]);
+      artistTracks.push(ret)
     }
-    setTracks(sortedTrackList)
+
+    setTracks(artistTracks.flat())
+
+    let sorted = artistTracks.flat().sort((a, b) => {
+      if (a.date_released < b.date_released) {
+        return 1;
+      } else if (a.date_released > b.date_released) {
+        return -1;
+      } else {
+        return 0;
+      }
+    });
+    setSortedTracks(sorted.flat())
   }
 
-  function removeArtist(index) {
+  async function removeArtist(index) {
     const updatedArtists = artists.filter((i) => i !== index);
-    const updatedArtistsNames = artistsNames.filter((i) => i !== index); 
+    const updatedArtistsMapping = artistsMapping.filter((i) => i.artistId !== index);
     setArtists(updatedArtists);
-    setArtistsNames(updatedArtistsNames)
+    setArtistsMapping(updatedArtistsMapping);
     localStorage.setItem('artists', updatedArtists)
-    localStorage.setItem('artistsNames', updatedArtistsNames)
-    if(updatedArtists.length === 0) setHasArtists(false)
+    if (updatedArtists.length === 0) setHasArtists(false)
+    else await populateArtistsTracks()
   }
 
   return (
@@ -134,9 +173,9 @@ function App() {
         {/* Added artists */}
         <div className='view-artists'>
           <ul>
-            {artistsNames.map((artist, index) => {
+            {artistsMapping && artistsMapping.map((artist, index) => {
               return (
-                <li className='artist-list-item' onClick={() => removeArtist(artist)}>{artist}</li>)
+                <li className='artist-list-item' onClick={async () => await removeArtist(artist.artistId)}>{artist.name}</li>)
             })}
           </ul>
         </div>
@@ -147,10 +186,15 @@ function App() {
         {!hasArtists && <h2>Add an artist to get started!</h2>}
         {/* Scrollable Pane */}
         <div className='artist-list'>
-          <button onClick={async () => await renderTracks()}>Render Releases</button>
-          {tracks.map((track, i) => {
-            return(<TrackPanel track_info={track}/>)
-          })}
+          <button onClick={async () => { await populateArtistsTracks(); }
+          }>Render Releases</button>
+          <button onClick={() => {console.log(artistsMapping)}}>mapping</button>
+          <ul>
+            {sortedTracks && sortedTracks.map((track) => {
+              return <TrackPanel track_info={track} />
+              // <p>{track.date_released}</p>
+            })}
+          </ul>
         </div>
       </div>
     </div>

@@ -188,7 +188,6 @@ function App() {
         <div className='artist-list'>
           <button onClick={async () => { await populateArtistsTracks(); }
           }>Render Releases</button>
-          <button onClick={() => {console.log(artistsMapping)}}>mapping</button>
           <ul>
             {sortedTracks && sortedTracks.map((track) => {
               return <TrackPanel track_info={track} />

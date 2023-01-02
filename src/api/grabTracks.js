@@ -30,9 +30,5 @@ export default async function grabTracks(artist_id, accessToken) {
     }
 
     const allData = Array.from(new Set([].concat(data["items"], dataAlbum["items"])))
-    console.log(allData)
     return allData
-    // else {
-    //     return data["items"]
-    // }
 }

@@ -46,12 +46,8 @@ function App() {
                 alert(artist + ' returned no naming results.')
               }
               else {
-                console.log('returned from checkIfValid with ID' + ret)
                 const newMap = { "artistId": artist, "name": ret }
-                var added = [...artistsMapping]
-                added = added.concat(newMap);
-                console.log(added)
-                setArtistsMapping(added)
+                setArtistsMapping(prevArtistsMapping => [...prevArtistsMapping, newMap])
               }
             })
           }
@@ -107,7 +103,6 @@ function App() {
       console.log("No access token - cannot populate tracks")
       return false
     }
-    console.log(`Populating tracks for ${artist_id} in populateTracks`)
     const tracksRet = await grabTracks(artist_id, accessToken)
     if (!tracksRet) {
       console.log('error in grabbing tracks')
@@ -186,7 +181,7 @@ function App() {
         {!hasArtists && <h2>Add an artist to get started!</h2>}
         {/* Scrollable Pane */}
         <div className='artist-list'>
-          <button onClick={async () => { await populateArtistsTracks(); }
+          <button className='render-button' onClick={async () => { await populateArtistsTracks(); }
           }>Render Releases</button>
           <ul>
             {sortedTracks && sortedTracks.map((track) => {

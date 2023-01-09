@@ -12,14 +12,12 @@ export default async function grabName(id, access_token) {
     })
         .then(response => response.json())
         .then(data => {
-            console.log(data)
             if (data.error) {
                 console.log(`Error in grabbing data`)
                 return false
             }
             else {
                 name = data.name;
-                console.log(`Successful name grab, ${name} for ${id}`)
             }
         })
     return name

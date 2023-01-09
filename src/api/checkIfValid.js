@@ -4,7 +4,6 @@ export default async function checkIfValid(id, access_token) {
     id = id.replace(" ", "%20");
     var artistId = ''
     var name = ''
-    console.log(`Searching for ${id}`)
     const url = `https://api.spotify.com/v1/search?q=${id}&type=artist&limit=2`
 
     await fetch(url, {
@@ -25,7 +24,6 @@ export default async function checkIfValid(id, access_token) {
             else {
                 name = data.artists.items[0].name;
                 artistId = data.artists.items[0].id;
-                console.log(`Successful ID grab, ${artistId} for ${id}`)
                 artistId = artistId
             }
         })

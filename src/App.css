@@ -1,3 +1,7 @@
+body {
+  font-family: Helvetica, Arial, sans-serif;
+}
+
 .App {
   min-height: 100vh;
   max-height: 100vh;
@@ -9,6 +13,7 @@
   width: 25%;
   min-width: 25%;
   max-height: 100vh;
+  overflow: hidden;
 }
 
 .add-artist {
@@ -20,6 +25,10 @@
   height: 100px;
 }
 
+.intro-blurb {
+  padding: 10px;
+}
+
 .view-artists {
   display: flex;
   flex-direction: column;
@@ -27,8 +36,17 @@
   text-align: center;
   margin: 10px;
   overflow-y: scroll;
-  height: calc(100vh - 100px);
+  height: calc(100vh - (177.22px + 100px + 37px));
   margin-top: 0;
+}
+
+.support-pane {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-left: 3px;
+  padding-right: 3px;
 }
 
 .artist-list-item {
@@ -70,10 +88,19 @@ button {
   margin: 10px;
   border-radius: 10px;
   border-style: solid;
+  min-width: fit-content;
+  max-width: 700px;
 }
 
 .track-pane:hover {
   background-color: antiquewhite;
+}
+
+.tracks-list {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
 }
 
 .special-border {
@@ -109,4 +136,13 @@ button {
 ul {
   list-style: none;
   padding-left: 0;
+}
+
+p {
+  margin: 0 !important;
+}
+
+a {
+  text-decoration: none;
+  color: #9DE7A0;
 }

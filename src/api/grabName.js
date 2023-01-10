@@ -13,7 +13,7 @@ export default async function grabName(id, access_token) {
         .then(response => response.json())
         .then(data => {
             if (data.error) {
-                console.log(`Error in grabbing data`)
+                console.log(`Error in grabbing data for ${id}`)
                 return false
             }
             else {

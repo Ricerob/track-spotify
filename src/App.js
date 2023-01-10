@@ -33,6 +33,7 @@ function App() {
           setAccessToken(data.access_token)
 
           var storedArtists = localStorage.getItem('artists');
+          console.log(`Stored artists: ${storedArtists}`)
           if (storedArtists) {
             if (storedArtists[0] !== "[") {
               storedArtists = `["${storedArtists}"]`
@@ -75,7 +76,7 @@ function App() {
     }
     else {
       const ret = await checkIfValid(input, accessToken)
-      if (!ret) {
+      if (!ret || !ret.artistId || ret.artistId === "") {
         alert(input + ' returned no search results.')
       }
       else {
@@ -151,14 +152,18 @@ function App() {
     const updatedArtistsMapping = artistsMapping.filter((i) => i.artistId !== index);
     setArtists(updatedArtists);
     setArtistsMapping(updatedArtistsMapping);
-    localStorage.setItem('artists', updatedArtists)
+    localStorage.setItem('artists', JSON.stringify(updatedArtists))
     if (updatedArtists.length === 0) setHasArtists(false)
-    else await populateArtistsTracks()
   }
 
   return (
     <div className="App">
       <div className='left-pane'>
+        {/* Intro blurb */}
+        <div className='intro-blurb'>
+          <h2>Welcome to Track!</h2>
+          <p>Add artists you like and let us find their most recent releases. Search below and click the find button to see their releases!</p>
+        </div>
         {/* Adding pane */}
         <div className='add-artist'>
           <p>Add Artist</p>
@@ -174,6 +179,11 @@ function App() {
             })}
           </ul>
         </div>
+        {/* Support pane */}
+        <div className='support-pane'>
+          <p>made by <a href='https://rehbu.me' target="_blank" rel="noopener noreferrer">robby rice</a></p>
+          <p>support this project</p>
+        </div>
       </div>
       {/* Track List */}
       <div className='right-pane'>
@@ -183,12 +193,14 @@ function App() {
         <div className='artist-list'>
           <button className='render-button' onClick={async () => { await populateArtistsTracks(); }
           }>Render Releases</button>
-          <ul>
-            {sortedTracks && sortedTracks.map((track) => {
-              return <TrackPanel track_info={track} />
-              // <p>{track.date_released}</p>
-            })}
-          </ul>
+          <div className='tracks-list'>
+            <ul>
+              {sortedTracks && sortedTracks.map((track) => {
+                return <TrackPanel track_info={track} />
+                // <p>{track.date_released}</p>
+              })}
+            </ul>
+          </div>
         </div>
       </div>
     </div>

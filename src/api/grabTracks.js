@@ -11,6 +11,7 @@ export default async function grabTracks(artist_id, accessToken) {
 
     if (data.error) {
         console.log(data)
+        console.log(`Error in grabbing tracks for ${artist_id}`)
         return false
     }
 
@@ -26,6 +27,7 @@ export default async function grabTracks(artist_id, accessToken) {
 
     if (dataAlbum.error) {
         console.log(dataAlbum)
+        console.log(`Error in grabbing tracks for ${artist_id}`)
         return false
     }
 

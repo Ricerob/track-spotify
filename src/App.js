@@ -164,22 +164,23 @@ function App() {
           <h2>Welcome to Track!</h2>
           <p>Add artists you like and let us find their most recent releases. Search below and click the find button to see their releases!</p>
         </div>
-        {/* Adding pane */}
-        <div className='add-artist'>
-          <p>Add Artist</p>
-          <input id='artist-input' type='text' />
-          <button onClick={() => handleClick()}>Add artist</button>
+        <div className='form-list'>
+          {/* Adding pane */}
+          <div className='add-artist'>
+            <input id='artist-input' type='text' />
+            <button onClick={() => handleClick()}>Add artist</button>
+          </div>
+          {/* Added artists */}
+          <div className='view-artists'>
+            <ul>
+              {artistsMapping && artistsMapping.map((artist, index) => {
+                return (
+                  <li className='artist-list-item' onClick={async () => await removeArtist(artist.artistId)}>{artist.name}</li>)
+              })}
+            </ul>
+          </div>
+          {/* Support pane */}
         </div>
-        {/* Added artists */}
-        <div className='view-artists'>
-          <ul>
-            {artistsMapping && artistsMapping.map((artist, index) => {
-              return (
-                <li className='artist-list-item' onClick={async () => await removeArtist(artist.artistId)}>{artist.name}</li>)
-            })}
-          </ul>
-        </div>
-        {/* Support pane */}
         <div className='support-pane'>
           <p>made by <a href='https://rehbu.me' target="_blank" rel="noopener noreferrer">robby rice</a></p>
           <p>support this project</p>
@@ -197,9 +198,12 @@ function App() {
             <ul>
               {sortedTracks && sortedTracks.map((track) => {
                 return <TrackPanel track_info={track} />
-                // <p>{track.date_released}</p>
               })}
             </ul>
+          </div>
+          <div className='support-pane-2'>
+            <p>made by <a href='https://rehbu.me' target="_blank" rel="noopener noreferrer">robby rice</a></p>
+            <p>support this project</p>
           </div>
         </div>
       </div>

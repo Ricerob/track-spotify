@@ -81,6 +81,10 @@ function App() {
       }
       else {
         console.log('returned from checkIfValid with ID' + ret.artistId)
+        if(artists.includes(ret.artistId)) {
+          alert(`${input} already added.`)
+          return
+        }
         setArtists([...artists, ret.artistId])
         setArtistsMapping([...artistsMapping, ret])
         console.log(artistsMapping)

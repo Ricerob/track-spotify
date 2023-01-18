@@ -19,10 +19,10 @@ export default function TrackPanel(track_info) {
             />
             <div className="text-info">
               <div className="top-text">
-                <h3>{track_info.track_info.track_name}</h3>
-                <h3>Release: {track_info.track_info.date_released}</h3>
+                <h3 className='px-5'>{track_info.track_info.track_name}</h3>
+                <h3 className='px-5'>Release: {track_info.track_info.date_released}</h3>
               </div>
-              <h4>{track_info.track_info.artists.join(", ")}</h4>
+              <h4 className='px-5'>{track_info.track_info.artists.join(", ")}</h4>
             </div>
           </div>
         </div>

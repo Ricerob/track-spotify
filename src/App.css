@@ -1,5 +1,6 @@
 body {
   font-family: Helvetica, Arial, sans-serif;
+  height: 100%;
 }
 
 @media screen and (min-width: 780px) {
@@ -68,7 +69,7 @@ body {
   .left-pane {
     background-color: #1DB954;
     width: 100%;
-    max-height: 30%;
+    height: 250px;
     display: flex;
     flex-direction: row;
   }
@@ -80,11 +81,17 @@ body {
     text-align: center;
     overflow-y: scroll;
     height: 100%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    background-color: #9DE7A0;
+    border-radius: 10px;
   }
 
   .form-list {
     display: flex;
     flex-direction: column;
+    padding-top: 10px;
+    padding-right: 10px;
   }
 
   .right-pane {
@@ -244,4 +251,9 @@ button:active {
   border: none;
   margin-bottom: 4px;
   width: 10rem;
+}
+
+.px-5 {
+  padding-left: 5px;
+  padding-right: 5px;
 }

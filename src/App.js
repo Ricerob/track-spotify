@@ -165,7 +165,7 @@ function App() {
       <div className='left-pane'>
         {/* Intro blurb */}
         <div className='intro-blurb'>
-          <h2>Welcome to Track!</h2>
+          <h2>Welcome to <b>Track!</b></h2>
           <p>Add artists you like and let us find their most recent releases. Search below and click the find button to see their releases!</p>
         </div>
         <div className='form-list'>
@@ -187,7 +187,7 @@ function App() {
         </div>
         <div className='support-pane'>
           <p>made by <a href='https://rehbu.me' target="_blank" rel="noopener noreferrer">robby rice</a></p>
-          <p>support this project</p>
+          <p><a href='https://account.venmo.com/u/Robby-Rice-' target="_blank" rel="noopener noreferrer">support this project</a></p>
         </div>
       </div>
       {/* Track List */}
@@ -207,7 +207,7 @@ function App() {
           </div>
           <div className='support-pane-2'>
             <p>made by <a href='https://rehbu.me' target="_blank" rel="noopener noreferrer">robby rice</a></p>
-            <p>support this project</p>
+            <p><a href='https://account.venmo.com/u/Robby-Rice-' target="_blank" rel="noopener noreferrer">support this project</a></p>
           </div>
         </div>
       </div>
